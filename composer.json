@@ -24,9 +24,15 @@
           "Warlof\\Seat\\Connector\\Drivers\\Teamspeak\\": "src/"
       }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/zenobio93/seat-connector.git"
+    }
+  ],
   "require": {
     "ext-json": "*",
-    "warlof/seat-connector": "^2.1"
+    "warlof/seat-connector": "3.0.x-dev"
   },
   "extra": {
     "laravel": {
@@ -34,5 +40,9 @@
         "Warlof\\Seat\\Connector\\Drivers\\Teamspeak\\TeamspeakConnectorServiceProvider"
       ]
     }
+  },
+  "require-dev": {
+    "rector/rector": "^0.18.3",
+    "driftingly/rector-laravel": "^0.24.1"
   }
 }

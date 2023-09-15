@@ -72,7 +72,7 @@ class RegistrationController extends Controller
         $identities = User::where('user_id', auth()->user()->id)->get();
 
         return view('seat-connector-teamspeak::registrations.confirm',
-            compact('drivers', 'identities', 'settings', 'registration_nickname'));
+            ['drivers' => $drivers, 'identities' => $identities, 'settings' => $settings, 'registration_nickname' => $registration_nickname]);
     }
 
     /**
@@ -142,9 +142,6 @@ class RegistrationController extends Controller
     }
 
     /**
-     * @param int $user_id
-     * @param string $nickname
-     * @param \Warlof\Seat\Connector\Drivers\IUser $user
      * @return \Warlof\Seat\Connector\Models\User
      */
     private function coupleUser(int $user_id, string $nickname, IUser $user): User
@@ -165,11 +162,7 @@ class RegistrationController extends Controller
         return $profile;
     }
 
-    /**
-     * @param \Warlof\Seat\Connector\Drivers\IClient $client
-     * @param \Warlof\Seat\Connector\Models\User $old_identity
-     */
-    private function revokeOldIdentity(IClient $client, User $old_identity)
+    private function revokeOldIdentity(IClient $client, User $old_identity): void
     {
         try {
             // retrieve teamspeak user related to old identity
@@ -182,7 +175,7 @@ class RegistrationController extends Controller
             foreach ($sets as $set) {
                 $user->removeSet($set);
             }
-        } catch (InvalidDriverIdentityException $e) {
+        } catch (InvalidDriverIdentityException) {
             return;
         }
 

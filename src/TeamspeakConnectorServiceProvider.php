@@ -35,7 +35,7 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->addRoutes();
         $this->addViews();
@@ -47,7 +47,7 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__ . '/Config/teamspeak.config.php', 'teamspeak.config');
@@ -56,19 +56,19 @@ class TeamspeakConnectorServiceProvider extends AbstractSeatPlugin
             __DIR__ . '/Config/seat-connector.config.php', 'seat-connector.drivers.teamspeak');
     }
 
-    private function addRoutes()
+    private function addRoutes(): void
     {
         if (! $this->app->routesAreCached()) {
             include __DIR__ . '/Http/routes.php';
         }
     }
 
-    private function addViews()
+    private function addViews(): void
     {
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'seat-connector-teamspeak');
     }
 
-    private function addTranslations()
+    private function addTranslations(): void
     {
         $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'seat-connector-teamspeak');
     }

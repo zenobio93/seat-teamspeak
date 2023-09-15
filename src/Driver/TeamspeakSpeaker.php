@@ -32,30 +32,19 @@ use Warlof\Seat\Connector\Exceptions\DriverException;
  */
 class TeamspeakSpeaker implements IUser
 {
-    /**
-     * @var string
-     */
-    private $id;
+    private string $id;
 
-    /**
-     * @var string
-     */
-    private $unique_id;
+    private string $unique_id;
 
-    /**
-     * @var string
-     */
-    private $nickname;
+    private string $nickname;
 
     /**
      * @var \Warlof\Seat\Connector\Drivers\ISet[]
      */
-    private $server_groups;
+    private \Illuminate\Support\Collection $server_groups;
 
     /**
      * TeamspeakSpeaker constructor.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -119,7 +108,7 @@ class TeamspeakSpeaker implements IUser
      * @param \Warlof\Seat\Connector\Drivers\ISet $group
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
-    public function addSet(ISet $group)
+    public function addSet(ISet $group): void
     {
         if (in_array($group, $this->getSets()))
             return;
@@ -138,7 +127,7 @@ class TeamspeakSpeaker implements IUser
      * @param \Warlof\Seat\Connector\Drivers\ISet $group
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
-    public function removeSet(ISet $group)
+    public function removeSet(ISet $group): void
     {
         if (! in_array($group, $this->getSets()))
             return;
@@ -154,10 +143,9 @@ class TeamspeakSpeaker implements IUser
     }
 
     /**
-     * @param array $attributes
      * @return $this
      */
-    public function hydrate(array $attributes)
+    public function hydrate(array $attributes): static
     {
         $this->id        = array_key_exists('cldbid', $attributes) ?
             $attributes['cldbid'] : $attributes['client_database_id'];

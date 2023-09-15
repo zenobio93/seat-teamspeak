@@ -33,10 +33,9 @@ use Psr\Http\Message\UriInterface;
  */
 class RateLimiterMiddleware
 {
-    const REDIS_CACHE_PREFIX = 'seat:seat-connector.drivers.teamspeak';
+    final public const REDIS_CACHE_PREFIX = 'seat:seat-connector.drivers.teamspeak';
 
     /**
-     * @param callable $handler
      * @return \Closure
      */
     public function __invoke(callable $handler)
@@ -64,7 +63,7 @@ class RateLimiterMiddleware
             // send the request and retrieve response
             $promise = $handler($request, $options);
 
-            return $promise->then(function (ResponseInterface $response) use ($key) {
+            return $promise->then(function (ResponseInterface $response) use ($key): ResponseInterface {
 
                 // update cache entry for the endpoint using new RateLimit / RateReset values
                 $metadata = $this->getEndpointMetadata($response);
@@ -77,11 +76,10 @@ class RateLimiterMiddleware
     }
 
     /**
-     * @param \Psr\Http\Message\UriInterface $uri
      * @param string $type
      * @return string
      */
-    private function getCacheKey(UriInterface $uri)
+    private function getCacheKey(UriInterface $uri): string
     {
         // generate a hash based on the endpoint
         $hash = sha1(sprintf('%s:%d', $uri->getHost(), $uri->getPort()));
@@ -91,7 +89,6 @@ class RateLimiterMiddleware
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
      * @return object
      */
     private function getEndpointMetadata(ResponseInterface $response)

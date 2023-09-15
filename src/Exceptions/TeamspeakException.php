@@ -33,8 +33,6 @@ abstract class TeamspeakException extends Exception
     /**
      * TeamspeakException constructor.
      *
-     * @param string $error
-     * @param int $code
      * @param \Throwable|null $previous
      */
     public function __construct(string $error, int $code = 0, Throwable $previous = null)

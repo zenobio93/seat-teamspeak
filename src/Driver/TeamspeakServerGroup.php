@@ -33,25 +33,17 @@ use Warlof\Seat\Connector\Exceptions\DriverException;
  */
 class TeamspeakServerGroup implements ISet
 {
-    /**
-     * @var string
-     */
-    private $id;
+    private string $id;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     /**
      * @var \Warlof\Seat\Connector\Drivers\IUser[]
      */
-    private $members;
+    private \Illuminate\Support\Collection $members;
 
     /**
      * TeamspeakServerGroup constructor.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -97,7 +89,7 @@ class TeamspeakServerGroup implements ISet
      * @param \Warlof\Seat\Connector\Drivers\IUser $user
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
-    public function addMember(IUser $user)
+    public function addMember(IUser $user): void
     {
         if (in_array($user, $this->getMembers()))
             return;
@@ -116,7 +108,7 @@ class TeamspeakServerGroup implements ISet
      * @param \Warlof\Seat\Connector\Drivers\IUser $user
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
      */
-    public function removeMember(IUser $user)
+    public function removeMember(IUser $user): void
     {
         if (! in_array($user, $this->getMembers()))
             return;
@@ -132,10 +124,9 @@ class TeamspeakServerGroup implements ISet
     }
 
     /**
-     * @param array $attributes
      * @return $this
      */
-    public function hydrate(array $attributes)
+    public function hydrate(array $attributes): static
     {
         $this->id   = $attributes['sgid'];
         $this->name = $attributes['name'];

@@ -43,25 +43,22 @@ use Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException;
  */
 class TeamspeakClient implements IClient
 {
-    /**
-     * @var \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient
-     */
-    private static $instance;
+    private static ?\Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakClient $instance = null;
 
     /**
      * @var \Warlof\Seat\Connector\Drivers\IUser[]
      */
-    private $speakers;
+    private readonly \Illuminate\Support\Collection $speakers;
 
     /**
      * @var \Warlof\Seat\Connector\Drivers\ISet[]
      */
-    private $server_groups;
+    private readonly \Illuminate\Support\Collection $server_groups;
 
     /**
      * @var \Warlof\Seat\Connector\Drivers\Teamspeak\Fetchers\IFetcher
      */
-    private $client;
+    private readonly object $client;
 
     /**
      * @var int
@@ -85,8 +82,6 @@ class TeamspeakClient implements IClient
 
     /**
      * TeamspeakClient constructor.
-     *
-     * @param array $parameters
      */
     public function __construct(array $parameters)
     {
@@ -234,12 +229,11 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param string $nickname
      * @return \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakSpeaker
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
      * @throws \Warlof\Seat\Connector\Exceptions\InvalidDriverIdentityException
      */
-    public function findUserByName(string $nickname)
+    public function findUserByName(string $nickname): \Warlof\Seat\Connector\Drivers\Teamspeak\Driver\TeamspeakSpeaker
     {
         try {
             // scope: manage_scope
@@ -273,13 +267,11 @@ class TeamspeakClient implements IClient
 
         $identity = Arr::first($response);
 
-        $speaker = new TeamspeakSpeaker([
+        return new TeamspeakSpeaker([
             'client_database_id'       => $identity->client_database_id,
             'client_unique_identifier' => $identity->client_unique_identifier,
             'client_nickname'          => $identity->client_nickname,
         ]);
-
-        return $speaker;
     }
 
     /**
@@ -302,7 +294,6 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param int $server_port
      * @return int
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
@@ -315,9 +306,7 @@ class TeamspeakClient implements IClient
 
         $instances = collect($response);
 
-        $instance = $instances->first(function ($instance) use ($server_port) {
-            return intval($instance->virtualserver_port) == $server_port;
-        });
+        $instance = $instances->first(fn($instance): bool => (int) $instance->virtualserver_port === $server_port);
 
         if (! $instance)
             throw new ServerException(sprintf('Unable to find a server instance listening on port %d.', $server_port));
@@ -326,11 +315,9 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
-     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
      */
-    public function addSpeakerToServerGroup(IUser $speaker, ISet $server_group)
+    public function addSpeakerToServerGroup(IUser $speaker, ISet $server_group): void
     {
         // scope: manage_scope
         $this->sendCall('POST', '/{instance}/servergroupaddclient', [
@@ -341,11 +328,9 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
-     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
      */
-    public function removeSpeakerFromServerGroup(IUser $speaker, ISet $server_group)
+    public function removeSpeakerFromServerGroup(IUser $speaker, ISet $server_group): void
     {
         // scope: manage_scope
         $this->sendCall('POST', '/{instance}/servergroupdelclient', [
@@ -356,7 +341,6 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param \Warlof\Seat\Connector\Drivers\ISet $server_group
      * @return IUser[]
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\TeamspeakException
      * @throws \Warlof\Seat\Connector\Exceptions\DriverException
@@ -379,7 +363,6 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param \Warlof\Seat\Connector\Drivers\IUser $speaker
      * @return ISet[]
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
      */
@@ -416,9 +399,6 @@ class TeamspeakClient implements IClient
     }
 
     /**
-     * @param string $method
-     * @param string $endpoint
-     * @param array $arguments
      * @return array
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
@@ -429,7 +409,7 @@ class TeamspeakClient implements IClient
         $method = strtoupper($method);
 
         foreach ($arguments as $uri_parameter => $value) {
-            if (strpos($uri, sprintf('{%s}', $uri_parameter)) === false)
+            if (!str_contains($uri, sprintf('{%s}', $uri_parameter)))
                 continue;
 
             $uri = str_replace(sprintf('{%s}', $uri_parameter), $value, $uri);
@@ -444,7 +424,7 @@ class TeamspeakClient implements IClient
                 ]);
             } else {
                 $response = $this->client->request($method, $uri, [
-                    'body' => json_encode($arguments),
+                    'body' => json_encode($arguments, JSON_THROW_ON_ERROR),
                 ]);
             }
 
@@ -457,7 +437,7 @@ class TeamspeakClient implements IClient
                     ],
                 ] : [
                     'request' => [
-                        'body' => json_encode($arguments),
+                        'body' => json_encode($arguments, JSON_THROW_ON_ERROR),
                     ],
                     'response' => [
                         'body' => $response->getBody()->getContents(),
@@ -470,7 +450,7 @@ class TeamspeakClient implements IClient
             throw new ServerException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $result = json_decode($response->getBody());
+        $result = json_decode($response->getBody(), null, 512, JSON_THROW_ON_ERROR);
 
         if ($result->status->code !== 0) {
             if (in_array($result->status->code, [5122, 5124]))
@@ -488,7 +468,7 @@ class TeamspeakClient implements IClient
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
      */
-    private function seedSpeakers()
+    private function seedSpeakers(): void
     {
         $from        = 0;
 
@@ -525,7 +505,7 @@ class TeamspeakClient implements IClient
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ServerException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\CommandException
      */
-    private function seedServerGroups()
+    private function seedServerGroups(): void
     {
         // scope: manage_scope
         $response = $this->sendCall('GET', '/{instance}/serverinfo', [

@@ -23,11 +23,11 @@ Route::group([
     'namespace'  => 'Warlof\Seat\Connector\Drivers\Teamspeak\Http\Controllers',
     'prefix'     => 'seat-connector',
     'middleware' => ['web', 'auth', 'locale'],
-], function () {
+], function (): void {
 
     Route::group([
         'prefix' => 'registration',
-    ], function () {
+    ], function (): void {
 
         Route::get('/teamspeak', [
             'as'   => 'seat-connector.drivers.teamspeak.registration',
@@ -44,7 +44,7 @@ Route::group([
     Route::group([
         'prefix' => 'settings',
         'middleware' => 'can:global.superuser',
-    ], function () {
+    ], function (): void {
 
         Route::post('/teamspeak', [
             'as' => 'seat-connector.drivers.teamspeak.settings',

@@ -33,10 +33,7 @@ use Warlof\Seat\Connector\Drivers\Teamspeak\Http\Middleware\Throttlers\RateLimit
  */
 class GuzzleFetcher implements IFetcher
 {
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    private $client;
+    private readonly \GuzzleHttp\Client $client;
 
     /**
      * GuzzleFetcher constructor.

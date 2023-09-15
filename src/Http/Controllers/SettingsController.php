@@ -71,7 +71,6 @@ class SettingsController extends Controller
     }
 
     /**
-     * @param array $settings
      * @return int
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\ConnexionException
      * @throws \Warlof\Seat\Connector\Drivers\Teamspeak\Exceptions\LoginException
