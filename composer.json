@@ -28,12 +28,6 @@
           "Warlof\\Seat\\Connector\\Drivers\\Teamspeak\\": "src/"
       }
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/zenobio93/seat-connector.git"
-    }
-  ],
   "require": {
     "ext-json": "*",
     "warlof/seat-connector": "^3.0"
