@@ -17,6 +17,10 @@
     {
       "name": "hderp886",
       "email": "hderp886@gmail.com"
+    },
+    {
+      "name": "Zenobio93",
+      "email": "development@hellmund.eu"
     }
   ],
   "autoload":{
@@ -32,7 +36,7 @@
   ],
   "require": {
     "ext-json": "*",
-    "warlof/seat-connector": "3.0.x-dev"
+    "warlof/seat-connector": "^3.0"
   },
   "extra": {
     "laravel": {
