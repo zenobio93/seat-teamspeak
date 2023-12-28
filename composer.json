@@ -30,7 +30,11 @@
   },
   "require": {
     "ext-json": "*",
-    "warlof/seat-connector": "^3.0"
+    "warlof/seat-connector": "^3.0",
+    "eveseat/services": "^5.0",
+    "eveseat/eveapi": "^5.0",
+    "eveseat/web": "^5.0",
+    "eveseat/api": "^5.0"
   },
   "extra": {
     "laravel": {
